@@ -28,4 +28,5 @@ pwd
 cp setup_terminal/client_setup_script.sh /home/$username/client_package
 
 tar -C /home/$username/ -zcvf /home/$username/client_package.tar.gz .
-#usermod -s /bin/false ${username}
+echo "removing the terminal access rights from user \"$username\". (To minimize posiblility of malicous activity)"
+usermod -s /bin/false ${username}

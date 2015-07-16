@@ -6,6 +6,7 @@ apt-get install ssh -y
 echo "Ensuring that autossh is installed"
 apt-get install autossh -y
 
+#getting the variables specific for this terminal
 server_port=$(cat server_port.txt)
 username=$(cat username.txt)
 server_addr=$(cat server_addr.txt)
