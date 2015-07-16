@@ -18,15 +18,20 @@ echo "generating server to client keys"
 sudo -u $username ssh-keygen -f /home/$username/.ssh/server_to_client -t rsa -N ''
 
 mkdir /home/$username/client_package
-echo "$username" > /home/$username/client_package/username.txt
-echo "$server_addr" > /home/$username/client_package/server_addr.txt
-echo "$ssh_port" > /home/$username/client_package/ssh_port.txt
-echo "$id" > /home/$username/client_package/server_port.txt
+
+#transfer the variables specific for this terminal and configuration to the client setup package
+echo '#!/usr/bin/env bash' > /home/$username/client_package/terminal_vars.sh
+echo "username=$username;
+server_addr=$server_addr;
+ssh_port=$ssh_port;
+id=$id;" >> /home/$username/client_package/terminal_vars.sh
+
 cp /home/$username/.ssh/client_to_server /home/$username/client_package/client_to_server
 cp /home/$username/.ssh/server_to_client.pub /home/$username/client_package/server_to_client.pub
 pwd
 cp setup_terminal/client_setup_script.sh /home/$username/client_package
 
+echo "generating a client_package.tar.gz file in /home/$username. This needs to be transferred to the terminal offband."
 tar -C /home/$username/ -zcvf /home/$username/client_package.tar.gz .
 echo "removing the terminal access rights from user \"$username\". (To minimize posiblility of malicous activity)"
 usermod -s /bin/false ${username}

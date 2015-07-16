@@ -7,10 +7,7 @@ echo "Ensuring that autossh is installed"
 apt-get install autossh -y
 
 #getting the variables specific for this terminal
-server_port=$(cat server_port.txt)
-username=$(cat username.txt)
-server_addr=$(cat server_addr.txt)
-ssh_port=$(cat ssh_port.txt)
+source terminal_vars.sh
 
 echo "Creating user $username"
 adduser --disabled-password --gecos \"\" $username
