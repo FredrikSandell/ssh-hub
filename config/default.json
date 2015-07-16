@@ -1,0 +1,19 @@
+{
+  "Server" : {
+    "server_addr" : "publicly reachable domain name for server",
+    "ssh_port" : 22,
+    "http_port" : 3001,
+    "terminal_start_port" : 40000,
+    "terminal_limit": 100,
+    "basic_auth" : {
+      "username" : "l948jd9jdolsJDl3LS",
+      "password" : "lkjfalkuf9i84y270hf92cn98234n0keq021"
+    }
+  },
+  "Db" : {
+    "implementation" : "nedb", //could theoretically also be "mongodb"
+    "config" : {
+      "file_name" : "dbfile"
+    }
+  }
+}
