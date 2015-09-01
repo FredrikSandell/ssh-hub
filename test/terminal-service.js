@@ -1,4 +1,4 @@
-var proxyquire = require('proxyquire')
+var proxyquire = require('proxyquire');
 var assert = require('assert');
 var db_stub = {};
 
