@@ -1,6 +1,6 @@
 {
   "Server" : {
-    "server_addr" : "publicly reachable domain name for server",
+    "server_addr" : "213.168.249.174",
     "ssh_port" : 22,
     "http_port" : 3001,
     "terminal_start_port" : 40000,

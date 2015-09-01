@@ -16,18 +16,23 @@ mkdir -p /home/$username/.ssh
 
 echo "Installing server key (To let server access the device)"
 cat server_to_client.pub >> /home/$username/.ssh/authorized_keys
+echo "Installing key to known hosts"
+ssh-keyscan -H $server_address >> /home/$username/.ssh/known_hosts
+echo "Installing client_to_server key"
+cp client_to_server /home/$username/
 
-chown /home/$username $username:$username
+chown -R $username:$username /home/$username
+chown -R $username:$username /home/$username/.ssh
 
 #TODO: below is not tested fully yet
 echo "Adding user $username to sudoers"
 sudo usermod -a -G sudo $username
 
 #generate the command which will set up a persistent reverse tunnel to the ssh hub instance
-autossh_startup_line="autossh -M 10984 -o \"PubkeyAuthentication=yes\" -o \"PasswordAuthentication=no\" -i client_to_server -N -R $server_port:localhost:22 $username@$server_addr -p $ssh_port &"
+autossh_startup_line="autossh -M 10984 -o \"PubkeyAuthentication=yes\" -o \"PasswordAuthentication=no\" -i client_to_server -N -R $id:localhost:22 $username@$server_addr -p $ssh_port &"
 
 echo "Installing the reverse tunnel command in /etc/rc.local to ensure that it is run at each startup"
-echo $autossh_startup_line >> /etc/rc.local
+echo $autossh_startup_line > /etc/rc.local
 
 echo "Starting the reverse tunnel"
 eval $autossh_startup_line

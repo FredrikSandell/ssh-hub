@@ -71,19 +71,25 @@ var terminal_service = {
   },
 
   create: function () {
+    console.log("creating");
     return getFirstAvailablePort().then(function (port) {
+      console.log("First available port is: "+port);
       return {
         terminal_id: port,
         username: 'terminal' + port
       };
     }).then(function (terminalData) {
-      return bash.execAsync('bash ../bash/setup_new_terminal.sh ' + terminalData.terminal_id + " " + serverConfig.server_addr + " " + serverConfig.ssh_port)
+      console.log("about to execute: bash ./bash/setup_new_terminal.sh " + terminalData.terminal_id + " " + serverConfig.server_addr + " " + serverConfig.ssh_port);
+      return bash.execAsync('bash ./bash/setup_new_terminal.sh ' + terminalData.terminal_id + " " + serverConfig.server_addr + " " + serverConfig.ssh_port)
         .then(function (stdOut) {
-            terminalData.creationLog = stdOut;
+          console.log("done executing");
+          console.log(stdOut);
+          terminalData.creationLog = stdOut;
+          db.insertAsync(terminalData);
           return terminalData;
         })
-    })
-      .then(db.insertAsync)
+    });
+      //.then(db.insertAsync)
   },
 
   run: function (terminalId, command) {

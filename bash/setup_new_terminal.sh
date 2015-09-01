@@ -31,7 +31,7 @@ id=$id;" >> $client_package_location/terminal_vars.sh
 cp /home/$username/.ssh/client_to_server $client_package_location/client_to_server
 cp /home/$username/.ssh/server_to_client.pub $client_package_location/server_to_client.pub
 pwd
-cp setup_terminal/client_setup_script.sh $client_package_location
+cp bash/client_setup_script.sh $client_package_location
 
 echo "generating a client_package.tar.gz file in /home/$username. This needs to be transferred to the terminal offband."
 tar -C /home/$username/ -zcvf /home/$username/client_package.tar.gz .
