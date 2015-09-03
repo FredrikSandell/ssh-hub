@@ -26,13 +26,18 @@ chown -R $username:$username /home/$username/.ssh
 
 #TODO: below is not tested fully yet
 echo "Adding user $username to sudoers"
-sudo usermod -a -G sudo $username
+usermod -a -G sudo $username
+echo "Enable sudo execution without password prompt"
+echo "$username ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 #generate the command which will set up a persistent reverse tunnel to the ssh hub instance
-autossh_startup_line="autossh -M 10984 -o \"PubkeyAuthentication=yes\" -o \"PasswordAuthentication=no\" -i client_to_server -N -R $id:localhost:22 $username@$server_addr -p $ssh_port &"
+autossh_startup_line="su $username -c 'autossh -M 10984 -o \"PubkeyAuthentication=yes\" -o \"PasswordAuthentication=no\" -i /home/$username/client_to_server -N -R $id:localhost:22 $username@$server_addr -p $ssh_port &'"
 
 echo "Installing the reverse tunnel command in /etc/rc.local to ensure that it is run at each startup"
-echo $autossh_startup_line > /etc/rc.local
+echo $autossh_startup_line > /home/$username/start_reverse_tunnel.sh
+chmod 755 /home/$username/start_reverse_tunnel.sh
+#append the startup command script before the last row in the rc.local. The last row is usually "exit 0"
+sed -i -e '$i \nohup sh /home/$username/start_reverse_tunnel.sh &\n' /etc/rc.local
 
 echo "Starting the reverse tunnel"
 eval $autossh_startup_line
