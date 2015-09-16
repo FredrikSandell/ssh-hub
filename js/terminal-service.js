@@ -53,6 +53,9 @@ var terminal_service = {
   },
 
   getTerminal: function (terminalId) {
+    db.findOneAsync({terminal_id : 40012}).then(function(terminal) {
+      console.log(terminal);
+    });
     return db.findOneAsync({terminal_id: terminalId});
   },
 
@@ -89,21 +92,19 @@ var terminal_service = {
           return terminalData;
         })
     });
-      //.then(db.insertAsync)
   },
 
   run: function (terminalId, command) {
     return db.findOneAsync({terminal_id: terminalId}).then(function (terminal) {
       if (terminal == null) {
+        console.log("No terminal found");
         throw new terminal_service.TerminalNotFound();
       } else {
         var username = terminal.username;
         var terminalPort = terminal.terminal_id;
         return sshTerminalAsync.executeSsh(username, terminalPort, command);
       }
-    })/*.catch(function(a){
-      console.log("sdadfasf");
-    })*/;
+    });
   }
 };
 module.exports = terminal_service;

@@ -51,11 +51,11 @@ router.get('/terminals', auth, function (req, res) {
 });
 
 router.get('/terminals/:terminal_id', auth, function (req, res) {
-  terminalService.getTerminal(req.params.terminal_id).then(function (terminal) {
+  terminalService.getTerminal(parseInt(req.params.terminal_id)).then(function (terminal) {
     if (terminal == null) {
       res.status(404).send('no terminal with id "' + req.params.terminal_id + '" was found in the system');
     } else {
-      res.json(terminals);
+      res.json(terminal);
     }
   }).catch(function (reason) {
     res.status(500).send(reason.toString());
@@ -71,7 +71,7 @@ router.delete('/terminals/dropAll', auth, function (req, res) {
 });
 
 router.delete('/terminals/:terminal_id', auth, function (req, res) {
-  terminalService.remove(req.params.terminal_id).then(function () {
+  terminalService.remove(parseInt(req.params.terminal_id)).then(function () {
     res.send("ok");
   }).catch(function (reason) {
     res.status(500).send(reason.toString());
@@ -102,18 +102,24 @@ router.post('/terminals/:terminal_id/run', auth, function (req, res) {
   var terminal_id = req.params.terminal_id;
   console.log("will apply command \"" + JSON.stringify(command) + "\" to terminal: \"" + terminal_id + "\"");
 
-  terminalService.run(terminal_id, command).then(function success(runResult) {
+  terminalService.run(parseInt(terminal_id), command).then(function success(runResult) {
     res.send(runResult);
   }, function error(reason) {
     if (typeof reason === terminalService.TerminalNotFoundError) {
       res.status(404).send("Terminal not found");
     } else {
+      console.log(reason);
       res.status(500).send(reason.toString());
     }
   }).catch(function (error) {
     console.log("unable to execute command for terminal: " + terminal_id);
     console.log(error);
-    res.status(500).send(error);
+    if (typeof error === terminalService.TerminalNotFoundError) {
+      res.status(404).send("Terminal not found");
+    } else {
+      console.log(reason);
+      res.status(500).send(reason.toString());
+    }
   });
 });
 
