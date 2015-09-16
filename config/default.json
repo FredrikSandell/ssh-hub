@@ -1,6 +1,7 @@
 {
   "Server" : {
     "server_addr" : "213.168.249.174",
+    "scp_username" : "root",
     "ssh_port" : 22,
     "http_port" : 3001,
     "terminal_start_port" : 40000,

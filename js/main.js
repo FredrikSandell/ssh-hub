@@ -8,8 +8,8 @@ var serverConfig = require('config').get('Server');
 var basicAuth = require('basic-auth-connect');
 //app.use(basicAuth('l948jd9jdolsJDl3LS', 'lkjfalkuf9i84y270hf92cn98234n0keq021'));
 //bDk0OGpkOWpkb2xzSkRsM0xTOmxramZhbGt1ZjlpODR5MjcwaGY5MmNuOTgyMzRuMGtlcTAyMQ==
-app.use(basicAuth(serverConfig.basic_auth.username, serverConfig.basic_auth.password));
-
+//app.use(basicAuth(serverConfig.basic_auth.username, serverConfig.basic_auth.password));
+auth = basicAuth(serverConfig.basic_auth.username, serverConfig.basic_auth.password)
 terminalService = require("./terminal-service.js");
 
 /**
@@ -42,7 +42,7 @@ var port = process.env.PORT || serverConfig.http_port;
 var router = express.Router();
 
 
-router.get('/terminals', function (req, res) {
+router.get('/terminals', auth, function (req, res) {
   terminalService.getTerminals().then(function (terminals) {
     res.json(terminals);
   }).catch(function (reason) {
@@ -50,7 +50,7 @@ router.get('/terminals', function (req, res) {
   });
 });
 
-router.get('/terminals/:terminal_id', function (req, res) {
+router.get('/terminals/:terminal_id', auth, function (req, res) {
   terminalService.getTerminal(req.params.terminal_id).then(function (terminal) {
     if (terminal == null) {
       res.status(404).send('no terminal with id "' + req.params.terminal_id + '" was found in the system');
@@ -62,7 +62,7 @@ router.get('/terminals/:terminal_id', function (req, res) {
   });
 });
 
-router.delete('/terminals/dropAll', function (req, res) {
+router.delete('/terminals/dropAll', auth, function (req, res) {
   terminalService.removeAll().then(function () {
     res.send("ok");
   }).catch(function (reason) {
@@ -70,7 +70,7 @@ router.delete('/terminals/dropAll', function (req, res) {
   });
 });
 
-router.delete('/terminals/:terminal_id', function (req, res) {
+router.delete('/terminals/:terminal_id', auth, function (req, res) {
   terminalService.remove(req.params.terminal_id).then(function () {
     res.send("ok");
   }).catch(function (reason) {
@@ -78,7 +78,7 @@ router.delete('/terminals/:terminal_id', function (req, res) {
   });
 });
 
-router.post('/terminals', function (req, res) {
+router.post('/terminals', auth, function (req, res) {
   console.log(req.body);
   if (req.body.description == undefined) {
     res.status(501).send('No description provided');
@@ -97,7 +97,7 @@ router.post('/terminals', function (req, res) {
     });
 });
 
-router.post('/terminals/:terminal_id/run', function (req, res) {
+router.post('/terminals/:terminal_id/run', auth, function (req, res) {
   var command = req.rawBody
   var terminal_id = req.params.terminal_id;
   console.log("will apply command \"" + JSON.stringify(command) + "\" to terminal: \"" + terminal_id + "\"");
@@ -115,6 +115,19 @@ router.post('/terminals/:terminal_id/run', function (req, res) {
     console.log(error);
     res.status(500).send(error);
   });
+});
+
+router.get('/setup/:terminal_id', function (req, res) {
+  var terminal_id = req.params.terminal_id;
+  res.status(200).send(
+    'echo "Fetching client setup package...";'
+    +'scp -P '+serverConfig.ssh_port+' '+serverConfig.scp_username
+    +'@'+serverConfig.server_addr+':/home/'+terminal_id+'/client_package.tar.gz .;'
+    +'echo "Extracting client setup package...";'
+    +'tar -zxvf client_package.tar.gz;'
+    +'cd client_package/;'
+    +'echo "Running the setup script. This will require sudo:";'
+    +'sudo bash client_setup_script.sh;');
 });
 
 app.use('/', router);
