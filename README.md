@@ -2,15 +2,15 @@
 
 A reverse ssh tunnel system for remote access to distributed SOCs.
 
-What problem does it solve?
+###What problem does it solve?
 
 When using SOCs, such as raspberrypi, it is often the case that the units needs to be left at physical locations that are hard to reach. Whatever the function the SOC is performing secure remote access to the device is often desirable in order to troubleshoot or upgrade software etc. Addressing the SOC can be troublesome due to unknown/changeing network conditions. E.g. if the SOC is connected to the network through a 3G modem.
 
-How ssh-hub solve the problem?
+###How ssh-hub solve the problem?
 
 The simplest way of guaranteeing remote access to a device which is not publicly accessible is to let the device itself connect to a known server. This is what ssh-hub does. ssh-hub generates the configuration required to let a remote SOC create a "persistent" reverse ssh tunnel against a ssh server; giving administrators root ssh access to all connected SOC units. 
 
-Prerequisites
+###Prerequisites
 1. A remote server with a public URL. The SOC units need to be able to uniquely address the server.
 2. An ssh daemon installed on the server. (Publicly accessible)
 3. Nodejs and npm needs to be installed on the server. I used nodejs version v0.10.25.
@@ -19,7 +19,7 @@ Prerequisites
 5. The SOC that I used when testing this was a Raspberry. This in it self is not important but the fact that I used NOOBS 1.4.1 (raspbian version "May 2015") is important. Raspbian is based on debian, in this case Debian Wheezy. Once again, if you are using another distribution the scripts may need to be altered a bit.
 6. The SOC needs to have a network connection! :)
 
-How do I use it?
+###How can you use it?
 
 1. Clone the repository.
 2. cd to repository. install depencencies with "npm install"
@@ -29,7 +29,8 @@ How do I use it?
 6. After that is done, log in to the SOC with a sudo enabled account and execute "bash <(curl -s http://{server_addr}:3001/setup/terminal{terminalId})". Follow the instructions. That's it! After that you should have a permanent reverse ssh tunnel against you server.
 7. Test the tunnel by executing runOnTerminal with 'echo "hello world"' as a body. Alternatively execute the attach_to_client.sh script with the terminalId as a parameter, e.g. "bash bash/attach_to_client.sh 40001". This will open a ssh session against that terminal. Please note that the terminal user is a no password sudo user on the terminal. 
 
-API (I was too lazy to do swagger)
+###API (I was too lazy to do swagger)
+```
 All requests have "Content-Type: application/json" if nothing else is specified
 All requests have basic auth protection if nothing else is specified
 
@@ -67,3 +68,4 @@ setupTerminal
 No basic auth protection
 GET /setup/terminal{terminalId}
 returns a bootstrap bash script which setups the client. Intended to be run on the SOC like so: "bash <(curl -s http://{SERVER_ADDRESS}:3001/setup/terminal{terminalId})"
+´´´
