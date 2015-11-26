@@ -3,6 +3,11 @@ var app = express();
 var bodyParser = require('body-parser');
 var Promise = require('bluebird');
 
+var expressLogging = require('express-logging');
+var logger = require('logops');
+
+app.use(expressLogging(logger));
+
 var serverConfig = require('config').get('Server');
 
 var basicAuth = require('basic-auth-connect');
@@ -79,7 +84,6 @@ router.delete('/terminals/:terminal_id', auth, function (req, res) {
 });
 
 router.post('/terminals', auth, function (req, res) {
-  console.log(req.body);
   if (req.body.description == undefined) {
     res.status(501).send('No description provided');
     res.send();
@@ -88,8 +92,6 @@ router.post('/terminals', auth, function (req, res) {
   var description = req.body.description;
   terminalService.create()
     .then(function (insertedTerminalData) {
-      console.log('inserted: ');
-      console.log(insertedTerminalData);
       res.json(insertedTerminalData);
     })
     .catch(function (error) {
@@ -100,7 +102,7 @@ router.post('/terminals', auth, function (req, res) {
 router.post('/terminals/:terminal_id/run', auth, function (req, res) {
   var command = req.rawBody
   var terminal_id = req.params.terminal_id;
-  console.log("will apply command \"" + JSON.stringify(command) + "\" to terminal: \"" + terminal_id + "\"");
+  logger.info("will apply command \"" + JSON.stringify(command) + "\" to terminal: \"" + terminal_id + "\"");
 
   terminalService.run(parseInt(terminal_id), command).then(function success(runResult) {
     res.send(runResult);
@@ -108,12 +110,11 @@ router.post('/terminals/:terminal_id/run', auth, function (req, res) {
     if (typeof reason === terminalService.TerminalNotFoundError) {
       res.status(404).send("Terminal not found");
     } else {
-      console.log(reason);
+      logger.warn(reason);
       res.status(500).send(reason.toString());
     }
   }).catch(function (error) {
-    console.log("unable to execute command for terminal: " + terminal_id);
-    console.log(error);
+    logger.warn("unable to execute command for terminal: " + terminal_id + " error: " + error);
     if (typeof error === terminalService.TerminalNotFoundError) {
       res.status(404).send("Terminal not found");
     } else {
@@ -126,16 +127,16 @@ router.post('/terminals/:terminal_id/run', auth, function (req, res) {
 router.get('/setup/:terminal_id', function (req, res) {
   var terminal_id = req.params.terminal_id;
   res.status(200).send(
-    'echo "Fetching client setup package...";'
-    +'scp -P '+serverConfig.ssh_port+' '+serverConfig.scp_username
-    +'@'+serverConfig.server_addr+':/home/'+terminal_id+'/client_package.tar.gz .;'
-    +'echo "Extracting client setup package...";'
-    +'tar -zxvf client_package.tar.gz;'
-    +'cd client_package/;'
-    +'echo "Running the setup script. This will require sudo:";'
-    +'sudo bash client_setup_script.sh;');
+      'echo "Fetching client setup package...";'
+      + 'scp -P ' + serverConfig.ssh_port + ' ' + serverConfig.scp_username
+      + '@' + serverConfig.server_addr + ':/home/' + terminal_id + '/client_package.tar.gz .;'
+      + 'echo "Extracting client setup package...";'
+      + 'tar -zxvf client_package.tar.gz;'
+      + 'cd client_package/;'
+      + 'echo "Running the setup script. This will require sudo:";'
+      + 'sudo bash client_setup_script.sh;');
 });
 
 app.use('/', router);
 app.listen(port);
-console.log('Server listening on port ' + port);
+logger.info('Server listening on port ' + port);

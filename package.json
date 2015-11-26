@@ -8,7 +8,11 @@
     "bluebird": "^2.9.27",
     "body-parser": "^1.12.4",
     "config": "^1.14.0",
+    "console-stamp": "^0.2.0",
     "express": "^4.12.4",
+    "express-logger": "0.0.3",
+    "express-logging": "^1.0.0",
+    "logops": "^0.5.0",
     "nedb": "^1.1.2",
     "ssh2": "^0.4.9"
   },

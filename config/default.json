@@ -14,7 +14,7 @@
   "Db" : {
     "implementation" : "nedb", //could theoretically also be "mongodb"
     "config" : {
-      "file_name" : "dbfile"
+      "file_name" : "database/dbfile"
     }
   }
 }

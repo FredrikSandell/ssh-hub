@@ -3,6 +3,7 @@ var serverConfig = require('config').get('Server');
 var sshTerminalAsync = require("./ssh-exec-on-terminal.js");
 var bash = require("./bash-exec.js");
 var Promise = require('bluebird');
+var logger = require('logops');
 
 function removeTerminal(terminal_id) {
   return bash.execAsync('bash ../bash/remove_terminal.sh ' + terminal_id)
@@ -53,9 +54,6 @@ var terminal_service = {
   },
 
   getTerminal: function (terminalId) {
-    db.findOneAsync({terminal_id : 40012}).then(function(terminal) {
-      console.log(terminal);
-    });
     return db.findOneAsync({terminal_id: terminalId});
   },
 
@@ -74,19 +72,19 @@ var terminal_service = {
   },
 
   create: function () {
-    console.log("creating");
+    logger.debug("creating");
     return getFirstAvailablePort().then(function (port) {
-      console.log("First available port is: "+port);
+      logger.debug("First available port is: "+port);
       return {
         terminal_id: port,
         username: 'terminal' + port
       };
     }).then(function (terminalData) {
-      console.log("about to execute: bash ./bash/setup_new_terminal.sh " + terminalData.terminal_id + " " + serverConfig.server_addr + " " + serverConfig.ssh_port);
+      logger.debug("about to execute: bash ./bash/setup_new_terminal.sh " + terminalData.terminal_id + " " + serverConfig.server_addr + " " + serverConfig.ssh_port);
       return bash.execAsync('bash ./bash/setup_new_terminal.sh ' + terminalData.terminal_id + " " + serverConfig.server_addr + " " + serverConfig.ssh_port)
         .then(function (stdOut) {
-          console.log("done executing");
-          console.log(stdOut);
+          logger.debug("done executing");
+          logger.debug(stdOut);
           terminalData.creationLog = stdOut;
           db.insertAsync(terminalData);
           return terminalData;
@@ -97,7 +95,7 @@ var terminal_service = {
   run: function (terminalId, command) {
     return db.findOneAsync({terminal_id: terminalId}).then(function (terminal) {
       if (terminal == null) {
-        console.log("No terminal found");
+        logger.warn("No terminal found");
         throw new terminal_service.TerminalNotFound();
       } else {
         var username = terminal.username;
