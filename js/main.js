@@ -17,6 +17,7 @@ var basicAuth = require('basic-auth-connect');
 auth = basicAuth(serverConfig.basic_auth.username, serverConfig.basic_auth.password)
 terminalService = require("./terminal-service.js");
 
+terminalService.init();
 /**
  * Allow the server to read raw text/plain posts
  */

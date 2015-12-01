@@ -36,7 +36,7 @@ mv /etc/sudoers.tmp /etc/sudoers
 
 
 #generate the command which will set up a persistent reverse tunnel to the ssh hub instance
-autossh_startup_line="su $username -c 'autossh -M 10984 -o \"PubkeyAuthentication=yes\" -o \"PasswordAuthentication=no\" -i /home/$username/client_to_server -N -R $id:localhost:22 $username@$server_addr -p $ssh_port &'"
+autossh_startup_line="su $username -c 'autossh -M 10984 -o \"UserKnownHostsFile=/dev/null\" -o \"StrictHostKeyChecking=no\" -o \"PubkeyAuthentication=yes\" -o \"PasswordAuthentication=no\" -i /home/$username/client_to_server -N -R $id:localhost:22 $username@$server_addr -p $ssh_port &'"
 
 echo "Installing the reverse tunnel command in /etc/rc.local to ensure that it is run at each startup"
 echo $autossh_startup_line > /home/$username/start_reverse_tunnel.sh

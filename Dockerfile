@@ -12,7 +12,8 @@ RUN apt-get update
 RUN apt-get -y install sudo supervisor openssh-server
 
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-COPY init_docker_ssh.sh /root/init_docker_ssh.sh
+COPY docker_scripts/init_ssh.sh /root/init_ssh.sh
+COPY docker_scripts/init_node.sh /root/init_node.sh
 
 RUN mkdir /var/run/sshd
 RUN echo 'root:sshpassword' | chpasswd
@@ -25,9 +26,3 @@ ENV NOTVISIBLE "in users profile"
 RUN echo "export VISIBLE=now" >> /etc/profile
 
 CMD ["/usr/bin/supervisord"]
-
-
-#CMD ["/usr/sbin/sshd", "-D"]
-
-#CMD ["node", "js/main.js"]
-#CMD /ssh-hub/startup.sh

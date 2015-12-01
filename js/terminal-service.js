@@ -103,6 +103,23 @@ var terminal_service = {
         return sshTerminalAsync.executeSsh(username, terminalPort, command);
       }
     });
+  },
+
+  //When starting in a docker container all users will be wiped from the system.
+  //Each start we need to add all users from the database to the linux system
+  init: function() {
+    db.findAsync({}).then(function (terminals) {
+      terminals.forEach(function (terminal) {
+        bash.execAsync('bash ./bash/adduser.sh ' + terminal.username + ' ' + terminal.terminal_id)
+          .then(function (stdOut) {
+            logger.debug("done executing");
+            logger.debug(stdOut);
+            return;
+          })
+      });
+    }).catch(function (reason) {
+      logger.error(reason)
+    });
   }
 };
 module.exports = terminal_service;

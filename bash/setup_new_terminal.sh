@@ -5,7 +5,8 @@ ssh_port=$3
 username="terminal${id}"
 
 echo "adding user ${username}"
-adduser --disabled-password --gecos \"\" $username
+bash ./bash/adduser.sh $username $id
+#adduser --disabled-password --gecos \"\" $username
 
 echo "making .ssh folder in home dir"
 sudo -u $username mkdir /home/$username/.ssh
