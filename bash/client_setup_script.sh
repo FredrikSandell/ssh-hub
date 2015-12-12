@@ -14,6 +14,8 @@ adduser --disabled-password --gecos \"\" $username
 
 mkdir -p /home/$username/.ssh
 
+cp terminal_vars.sh /home/$username/terminal_vars.sh
+
 echo "Installing server key (To let server access the device)"
 cat server_to_client.pub >> /home/$username/.ssh/authorized_keys
 echo "Installing key to known hosts"
