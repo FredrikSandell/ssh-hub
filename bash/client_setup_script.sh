@@ -47,9 +47,10 @@ chmod 755 /home/$username/start_reverse_tunnel.sh
 #append the startup command script before the last row in the rc.local. The last row is usually "exit 0"
 sed -i -e '$i \nohup sh /home/'$username'/start_reverse_tunnel.sh &\n' /etc/rc.local
 
-sed -i -e '$i \export TERMINAL_ID='$id'\n' >> /etc/environment
-sed -i -e '$i \export TERMINAL_HOME=/home/'$USERNAME'\n' >> /etc/environment
-source /etc/environment
+echo "TERMINAL_ID=$id\n" >> /etc/environment
+echo "TERMINAL_HOME=/home/$USERNAME\n" >> /etc/environment
+export TERMINAL_ID=$id
+export TERMINAL_HOME=/home/$USERNAME
 
 echo "Starting the reverse tunnel"
 eval $autossh_startup_line
